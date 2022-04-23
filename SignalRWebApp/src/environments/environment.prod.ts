@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  signalingServerUrl: 'http://localhost:5000/hubs'
 };
