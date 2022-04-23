@@ -1,0 +1,33 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <span><strong>SignalR Webapp</strong></span>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<div class="content">
+  <p class="main-text">Login</p>
+  
+  <form>
+    <mat-form-field class="input-field">
+
+      <mat-label>Username (e.g. red panda)</mat-label>
+      <input matInput autofocus required [(ngModel)]="name" name="username" #username="ngModel" type="text" minlength="2">
+          
+      <mat-error *ngIf="username.invalid && (username.dirty || username.touched)">
+        <mat-error *ngIf="username.errors?.['required']">
+          The username is required
+        </mat-error>
+        <mat-error *ngIf="username.errors?.['minlength']">
+          The username needs to have at least 2 characters
+        </mat-error>
+      </mat-error>
+  
+    </mat-form-field>
+    
+    <div class="buttons">
+      <button class="send-button" mat-raised-button color="primary" (click)="startChat()" [disabled]="username.errors">
+        Start
+      </button>
+    </div>
+  </form>
+</div>

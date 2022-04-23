@@ -8,9 +8,9 @@ namespace SignalRSignalingServer.Hubs
     [AllowAnonymous]
     public class AuthHub : Hub
     {
-        public async Task<string> Authorize()
+        public async Task<string> Authorize(string username)
         {
-            return await Task.Run(() => { return TokenHelper.GenerateToken(); });
+            return await Task.Run(() => { return TokenHelper.GenerateToken(username); });
         }
     }
 }

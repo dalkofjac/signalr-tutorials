@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SignalRSignalingServer.Hubs
@@ -8,6 +11,8 @@ namespace SignalRSignalingServer.Hubs
     [Authorize]
     public class MainHub : Hub
     {
+        public static Dictionary<string, string> ConnectedClients = new Dictionary<string, string>();
+
         #region General
 
         public async Task SendMessage(object message)
@@ -45,13 +50,29 @@ namespace SignalRSignalingServer.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            await Clients.AllExcept(Context.ConnectionId).SendAsync("ClientConnected", Context.ConnectionId);
+            var clientUsername = Context.User?.Claims?.FirstOrDefault(_ => _.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (clientUsername != null) 
+            {
+                if (!ConnectedClients.ContainsKey(Context.ConnectionId))
+                {
+                    ConnectedClients.Add(Context.ConnectionId, clientUsername);
+                }
+                await Clients.AllExcept(Context.ConnectionId).SendAsync("ClientConnected", clientUsername);
+            }
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            await Clients.AllExcept(Context.ConnectionId).SendAsync("ClientDisconnected", Context.ConnectionId);
+            if (ConnectedClients.ContainsKey(Context.ConnectionId))
+            {
+                ConnectedClients.Remove(Context.ConnectionId);
+            }
+            var clientUsername = Context.User?.Claims?.FirstOrDefault(_ => _.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (clientUsername != null) 
+            {
+                await Clients.AllExcept(Context.ConnectionId).SendAsync("ClientDisconnected", Context.ConnectionId);
+            }
             await base.OnDisconnectedAsync(exception);
         }
 

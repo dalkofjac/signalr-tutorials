@@ -8,20 +8,16 @@ import { SignalrService } from 'src/app/services/signalr.service';
 })
 export class ChatComponent implements OnInit {
 
+  name!: string;
+
   constructor(
     private signaling: SignalrService
-  ) { }
+  ) {
+    this.name = sessionStorage.getItem('username') || '';
+  }
 
-  ngOnInit(): void {
-    this.signaling.connect('/auth', false).then(() => {
-      if (this.signaling.isConnected()) {
-        this.signaling.invoke('Authorize').then((token: string) => {
-          if (token) {
-            sessionStorage.setItem('token', token);
-          }
-        });
-      }
-    });
+  async ngOnInit(): Promise<void> {
+    await this.signaling.connect('/main', true);
   }
 
 }
