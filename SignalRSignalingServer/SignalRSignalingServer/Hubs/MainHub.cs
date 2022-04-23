@@ -15,14 +15,18 @@ namespace SignalRSignalingServer.Hubs
 
         #region General
 
-        public async Task SendMessage(object message)
+        public async Task SendMessage(string from, object message)
         {
-            await Clients.All.SendAsync("Message", message);
+            await Clients.All.SendAsync("message", from, message);
         }
 
-        public async Task SendMessageToClient(string client, object message)
+        public async Task SendMessageToClient(string from, string to, object message)
         {
-            await Clients.Client(client).SendAsync("Message", message);
+            var connection = ConnectedClients.FirstOrDefault(c => c.Value == to).Key;
+            if (connection != null)
+            {
+                await Clients.Client(connection).SendAsync("message", from, message);
+            }
         }
 
         #endregion
@@ -39,9 +43,9 @@ namespace SignalRSignalingServer.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
         }
 
-        public async Task SendMessageToGroup(string group, object message)
+        public async Task SendMessageToGroup(string from, string to, object message)
         {
-            await Clients.OthersInGroup(group).SendAsync("Message", message);
+            await Clients.OthersInGroup(to).SendAsync("message", from, message);
         }
 
         #endregion
@@ -50,14 +54,14 @@ namespace SignalRSignalingServer.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            var clientUsername = Context.User?.Claims?.FirstOrDefault(_ => _.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (clientUsername != null) 
+            var client = Context.User?.Claims?.FirstOrDefault(_ => _.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (client != null) 
             {
                 if (!ConnectedClients.ContainsKey(Context.ConnectionId))
                 {
-                    ConnectedClients.Add(Context.ConnectionId, clientUsername);
+                    ConnectedClients.Add(Context.ConnectionId, client);
                 }
-                await Clients.AllExcept(Context.ConnectionId).SendAsync("ClientConnected", clientUsername);
+                await Clients.AllExcept(Context.ConnectionId).SendAsync("connected", client);
             }
             await base.OnConnectedAsync();
         }
@@ -68,10 +72,10 @@ namespace SignalRSignalingServer.Hubs
             {
                 ConnectedClients.Remove(Context.ConnectionId);
             }
-            var clientUsername = Context.User?.Claims?.FirstOrDefault(_ => _.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (clientUsername != null) 
+            var client = Context.User?.Claims?.FirstOrDefault(_ => _.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (client != null) 
             {
-                await Clients.AllExcept(Context.ConnectionId).SendAsync("ClientDisconnected", Context.ConnectionId);
+                await Clients.AllExcept(Context.ConnectionId).SendAsync("disconnected", client);
             }
             await base.OnDisconnectedAsync(exception);
         }

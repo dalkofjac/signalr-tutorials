@@ -19,18 +19,18 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async startChat(): Promise<void> {
-    await this.signaling.connect('/auth', false).then(() => {
+  startChat(): void {
+    this.signaling.connect('/auth', false).then(() => {
       if (this.signaling.isConnected()) {
         this.signaling.invoke('Authorize', this.name).then((token: string) => {
           if (token) {
             sessionStorage.setItem('username', this.name);
             sessionStorage.setItem('token', token);
+            this.router.navigate(['chat']);
           }
         });
       }
     });
-    this.router.navigate(['chat']);
   }
 
 }
