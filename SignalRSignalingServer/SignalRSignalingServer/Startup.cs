@@ -60,7 +60,16 @@ namespace SignalRSignalingServer
                 };
             });
 
-            services.AddSignalR();
+            var signalR = services.AddSignalR();
+
+            var azureSignalRConnectionString = Configuration.GetValue<string>("AzureSignalRConnectionString");
+            if (!azureSignalRConnectionString.IsNullOrEmpty())
+            {
+                signalR.AddAzureSignalR(options =>
+                {
+                    options.ConnectionString = azureSignalRConnectionString;
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
