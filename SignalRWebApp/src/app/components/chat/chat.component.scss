@@ -1,10 +1,43 @@
 .content {
-  display: grid;
   text-align: center;
-  align-content: center;
-  margin: 10px;
 }
 
-.main-text {
-  font-size: 20px;
+.card {
+  margin: 10px;
+  width: 50%;
+  display: inline-block;
+}
+
+.message {
+  width: 100%;
+
+  &-local {
+    @extend .message;
+    text-align: end;
+  }
+
+  &-remote {
+    @extend .message;
+    text-align: start;
+
+    &-from {
+      font-size: 11px !important;
+    }
+  }
+}
+
+.form-field {
+  width: 100%;
+
+  &-select {
+    margin: 0 5px;
+  }
+}
+
+.mat-icon {
+  color: black;
+}
+
+.mat-list-item {
+  margin: 10px;
 }

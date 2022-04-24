@@ -17,7 +17,7 @@ namespace SignalRSignalingServer.Hubs
 
         public async Task SendMessage(string from, object message)
         {
-            await Clients.All.SendAsync("message", from, message);
+            await Clients.Others.SendAsync("message", from, message);
         }
 
         public async Task SendMessageToClient(string from, string to, object message)

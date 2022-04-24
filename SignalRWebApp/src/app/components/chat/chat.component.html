@@ -5,6 +5,58 @@
 </mat-toolbar>
   
 <div class="content">
-  <p class="main-text">Chat</p>
-    Welcome {{name}}!
+  <mat-card class="card">
+    <mat-card-title>Chat</mat-card-title>
+    <mat-card-subtitle>Welcome to chat {{name}}!</mat-card-subtitle>
+    <mat-list>
+      <mat-list-item *ngFor="let message of messages">
+        <div class="message-local" *ngIf="message.from === name">
+          <div mat-line>{{message.message}}</div>
+          <mat-divider></mat-divider>
+        </div>
+        <div class="message-remote" *ngIf="message.from !== name">
+          <div mat-line>{{message.message}}</div>
+          <div mat-line class="message-remote-from">From: {{message.from}}</div>
+          <mat-divider></mat-divider>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </mat-card>
+  <mat-card class="card">
+    <div>
+      <mat-form-field class="form-field-select" appearance="fill">
+        <mat-label>Send to...</mat-label>
+        <mat-select [(ngModel)]="sendTo">
+          <mat-option *ngFor="let item of sendToList" [value]="item">{{item}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field *ngIf="sendTo === 'Group'" class="form-field-select" appearance="fill">
+        <mat-label>Select group...</mat-label>
+        <mat-select [(ngModel)]="group">
+          <mat-option *ngFor="let item of groups" [value]="item">{{item}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field *ngIf="sendTo === 'Client'" class="form-field-select" appearance="fill">
+        <mat-label>Type client's name...</mat-label>
+        <input matInput autofocus [(ngModel)]="client" type="text">
+      </mat-form-field>
+    </div>
+    <mat-form-field class="form-field" appearance="fill">
+      <mat-label>Enter a group name...</mat-label>
+      <input matInput autofocus [(ngModel)]="group" type="text">
+      <button matSuffix mat-icon-button (click)="joinGroup()">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button matSuffix mat-icon-button (click)="leaveGroup()">
+        <mat-icon>remove</mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-form-field class="form-field" appearance="fill">
+      <mat-label>Type a message...</mat-label>
+      <input matInput autofocus [(ngModel)]="message" type="text" (keyup.enter)="sendMessage()">
+      <button matSuffix mat-icon-button (click)="sendMessage()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-form-field>
+  </mat-card>
 </div>

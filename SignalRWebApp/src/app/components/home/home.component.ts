@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit {
           if (token) {
             sessionStorage.setItem('username', this.name);
             sessionStorage.setItem('token', token);
+            
             this.router.navigate(['chat']);
           }
         });
